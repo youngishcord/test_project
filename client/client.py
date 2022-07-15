@@ -2,7 +2,7 @@ from twisted.internet import reactor, protocol
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import ReconnectingClientFactory as CF
 from twisted.internet.endpoints import TCP4ClientEndpoint
-from config import HOST, PORT
+from config.config import HOST, PORT
 
 class Client(Protocol):
     def __init__(self):

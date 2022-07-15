@@ -2,7 +2,7 @@ from twisted.internet import reactor, protocol
 from twisted.internet.protocol import Protocol, connectionDone
 from twisted.internet.protocol import ServerFactory as SF
 from twisted.internet.endpoints import TCP4ServerEndpoint
-from config import PORT
+from config.config import PORT
 
 class Server(Protocol):
     def __init__(self):
