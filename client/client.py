@@ -1,44 +1,56 @@
+from pydoc import cli
 from twisted.internet import reactor, protocol
 from twisted.internet.protocol import Protocol
 from twisted.internet.protocol import ReconnectingClientFactory as CF
 from twisted.internet.endpoints import TCP4ClientEndpoint
 from config.config import HOST, PORT
 import json
+import messages
+import pymongo
+
+
+
 
 class Client(Protocol):
     def __init__(self):
         reactor.callInThread(self.send_data)
+        """client = pymongo.MongoClient('localhost', 27017)
+        for k in client.list_databases():
+            print(k["name"])
+        db = client[input("select name of DB")]
+        for j in db.list_collections():
+            print(j["name"])
+        collection = db[input("select name of collection")]"""
 
     def dataReceived(self, data):
         data = data.decode()
-        print(data)
+        data = messages.deserialization(data)
+        print("select DB\n", data)
+        
 
     def connectionMade(self):
         print('Hello client')
+        #self.transport.write(messages.conection_db())
 
     def send_data(self):
         while True:
             mess = input()
             if mess[0] == "!":
                 if mess == "!help":
-                    print("message for help")
+                    messages.help()
+                    
                 elif mess == "!sum":
-                    try:
-                        a = int(input("input arg1 "))
-                        b = int(input("input arg2 "))
-                        c = {"func":f"{mess[1:]}", 
-                            "arg1":a, 
-                            "arg2":b}
-                        print(c)
-                        d = json.dumps(c)
-                        print(type(d))
-                        self.transport.write(d.encode())
-                    except ValueError:
-                        print("type except")
-                    except:
-                        print('error')
+                    self.transport.write(messages.summ().encode())
+
+                elif mess == "!add":
+
+                    pass
+
+                elif mess == "!del":
+                    pass
+
             else:
-                print("commands start at !\ninput !help for more info")
+                #print("commands start at !\ninput !help for more info")
                 self.transport.write(mess.encode())
 
 
