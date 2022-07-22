@@ -1,3 +1,4 @@
+from email import message
 from pydoc import cli
 from twisted.internet import reactor, protocol
 from twisted.internet.protocol import Protocol
@@ -25,7 +26,7 @@ class Client(Protocol):
     def dataReceived(self, data):
         data = data.decode()
         data = messages.deserialization(data)
-        print("select DB\n", data)
+        print(data)
         
 
     def connectionMade(self):
@@ -38,12 +39,23 @@ class Client(Protocol):
             if mess[0] == "!":
                 if mess == "!help":
                     messages.help()
+
+                elif mess == "!showdb":
+                    self.transport.write(messages.showdb().encode())
+
+                elif mess == "!db":
+                    self.transport.write(messages.db().encode())
+
+                elif mess == "!showcoll":
+                    self.transport.write(messages.showcoll().encode())
+
+                elif mess == "!coll":
+                    pass
                     
                 elif mess == "!sum":
                     self.transport.write(messages.summ().encode())
 
                 elif mess == "!add":
-
                     pass
 
                 elif mess == "!del":
@@ -52,7 +64,6 @@ class Client(Protocol):
             else:
                 #print("commands start at !\ninput !help for more info")
                 self.transport.write(mess.encode())
-
 
 
 class ClientFactory(CF):
