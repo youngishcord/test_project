@@ -62,8 +62,13 @@ class Server(Protocol):
                     elif data["func"] == "showcoll":
                         self.show_coll()
                     elif data["func"] == "coll":
-                        self.select_coll()
-
+                        self.select_coll(data)
+                    elif data['func'] == "help":
+                        self.help()
+                    elif data['func'] == "add":
+                        self.insert_doc(data['body'])
+                    elif data['func'] == "del":
+                        self.delete_doc(data['body'])
                 except:
                     print(servmess("wrong 'func' name"))
             else:
@@ -81,7 +86,6 @@ class Server(Protocol):
         print(q)
         self.transport.write(q.encode())
         
-
     def select_db(self, data):
         print("select db called")
         try:
@@ -121,23 +125,78 @@ class Server(Protocol):
             print("show_coll MISSTAKE")
             self.transport.write(servmess("show_coll MISSTAKE").encode())
 
-
     def select_coll(self, data):
         try:
-            if self.coll_names == "empty":
-                pass
-        
+            if data["create"] == "0":
+                if self.coll_names == "empty":
+                    print(servmess('collection empty'))
+                    self.transport.write(servmess("collection empty\n").encode())
+                    return
+                if data['name'] not in self.coll_names:
+                    print(servmess(f"{data['name']} not in collections"))
+                    self.transport.write(servmess(f"{data['name']} not in collections\n").encode())
+                    return
+                else:
+                    self.collection = self.db[data['name']]
+            else:
+                self.collection = self.db[data['name']]
         except:
             print("select_coll MISSTAKE")
             self.transport.write(servmess("select_coll MISSTAKE").encode())
 
 
-    def help(self, data):
-        pass
+    def insert_doc(self, data):
+        try:
+            data = commands.deserialization(data)
+            if self.collection != None:
+                return self.collection.insert_one(data).inserted_id
+            else:
+                print("collection not selected")
+                self.transport.write(servmess("collection not selected").encode())
+        except:
+            print('cant insert')
+            self.transport.write(servmess("insert MISSTAKE").encode())
+
+    def delete_doc(self, data):
+        try:
+            data = commands.deserialization(data)
+            if self.collection != None:
+                return self.collection.delete_one(data)
+            else:
+                print("collection not selected")
+                self.transport.write(servmess("collection not selected").encode())
+        except:
+            print('cant delete')
+            self.transport.write(servmess("delete MISSTAKE").encode())
+
+
+    def help(self):
+        print(servmess('''!help
+    !showdb
+    !showcoll
+    !db for select db
+    !coll for select collection
+    !add for insert doc
+    or use {"func": "add","body":{.....}}
+    !del for delete doc
+    or use {"func": "del","body":{.....}}
+    ''').encode())
+
+        self.transport.write(servmess('''!help
+    !showdb
+    !showcoll
+    !db for select db
+    !coll for select collection
+    !add for insert doc
+    or use {"func": "add","body":{.....}}
+    !del for delete doc
+    or use {"func": "del","body":{.....}}
+    ''').encode())
 
         
     def connectionLost(self, reason):
         print(f"connectoin lost <{self}>,\n{reason}")
+
 
 class ServerFactory(SF):
     def __init__(self):

@@ -35,35 +35,39 @@ class Client(Protocol):
 
     def send_data(self):
         while True:
-            mess = input()
-            if mess[0] == "!":
-                if mess == "!help":
-                    messages.help()
+            try:
+                mess = input()
+                if mess[0] == "!":
+                    if mess == "!help":
+                        self.transport.write(messages.help().encode())
 
-                elif mess == "!showdb":
-                    self.transport.write(messages.showdb().encode())
+                    elif mess == "!showdb":
+                        self.transport.write(messages.showdb().encode())
 
-                elif mess == "!db":
-                    self.transport.write(messages.db().encode())
+                    elif mess == "!db":
+                        self.transport.write(messages.db().encode())
 
-                elif mess == "!showcoll":
-                    self.transport.write(messages.showcoll().encode())
+                    elif mess == "!showcoll":
+                        self.transport.write(messages.showcoll().encode())
 
-                elif mess == "!coll":
-                    pass
-                    
-                elif mess == "!sum":
-                    self.transport.write(messages.summ().encode())
+                    elif mess == "!coll":
+                        self.transport.write(messages.coll().encode())
 
-                elif mess == "!add":
-                    pass
+                    elif mess == "!sum":
+                        self.transport.write(messages.summ().encode())
 
-                elif mess == "!del":
-                    pass
+                    elif mess == "!add":
+                        self.transport.write(messages.add().encode())
 
-            else:
-                #print("commands start at !\ninput !help for more info")
-                self.transport.write(mess.encode())
+                    elif mess == "!del":
+                        self.transport.write(messages.dell().encode())
+
+                else:
+                    #print("commands start at !\ninput !help for more info")
+                    self.transport.write(mess.encode())
+            except:
+                print("lol")
+
 
 
 class ClientFactory(CF):

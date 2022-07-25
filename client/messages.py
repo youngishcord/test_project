@@ -4,14 +4,17 @@ import pymongo
 
 
 def deserialization(data):
-    if data[0] == "{":
-        try:
-            data = json.loads(data)
-        except:
-            print("cant Deserialize data (client) >>")
-    else:
-        print("wrong format for Deserialization (client) >>")
-    return data
+    try:
+        if data[0] == "{":
+            try:
+                data = json.loads(data)
+            except:
+                print("cant Deserialize data (client) >>")
+        else:
+            print("wrong format for Deserialization (client) >>")
+        return data
+    except:
+        return data
 
     
 def serialization(data):
@@ -32,7 +35,7 @@ def showdb():
 
 def check():
     try:
-        a = int(input("create a db if there isn't one? (1/0) (standart 0) "))
+        a = int(input("create if there isn't one? (1/0) (standart 0) "))
         if a == 1:
             return '1'
         else:
@@ -51,13 +54,46 @@ def db():
         return mess
     return serialization(mess)
 
-
 def showcoll():
     mess = {"func":"showcoll"}
     return serialization(mess)
 
+def coll():
+    try:
+        mess = {"func":"coll",
+            "name": input("input coll name "), 
+            "create":check()}
+    except:
+        mess = "coll request err"
+        print(mess)
+        return mess
+    return serialization(mess)
+
+def body_check():
+    try:
+        a = input("input json data \{\}")
+        if a[0] == "{" and a[-1] == "}":
+            return a
+    except:
+        print("wrong data input")
+
+def add():
+    mess = {
+        "func": "add",
+        "body":body_check()
+    }
+    return serialization(mess)
+
+def dell():
+    mess = {
+        "func": "del",
+        "body":body_check()
+        }
+    return serialization(mess)
+
+
 def help():
-    print("!sum for summation\n!add for append one doc\n!del for delete ode doc")
+    return serialization({'func':'help'})
 
 
 def summ():

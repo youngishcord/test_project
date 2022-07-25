@@ -7,14 +7,17 @@ def servmess(data):
 
 
 def deserialization(data):
-    if data[0] == "{":
-        try:
-            data = json.loads(data)
-        except:
-            print("cant deserialize data (server)")
-    else:
-        print("wrong format for deserialization (server)")
-    return data
+    try:
+        if data[0] == "{":
+            try:
+                data = json.loads(data)
+            except:
+                print("cant deserialize data (server)")
+        else:
+            print("wrong format for deserialization (server)")
+        return data
+    except:
+        return data
 
 
 def serialization(data):
